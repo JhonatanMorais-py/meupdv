@@ -574,15 +574,190 @@ class TelaDashboard(ctk.CTk):
         )
         title_label.pack(pady=10)
         
-        # Descrição
-        desc_label = ctk.CTkLabel(
-            placeholder_frame,
-            text="Este módulo está em desenvolvimento.\nEm breve estará disponível com todas as funcionalidades.",
-            font=ctk.CTkFont(size=14),
-            text_color=self.colors['text_secondary']
-        )
-        desc_label.pack(pady=20)
+        # Tratamento especial para o módulo estoque
+        if module_name == "estoque":
+            # Descrição específica para estoque
+            desc_label = ctk.CTkLabel(
+                placeholder_frame,
+                text="Acesse o módulo completo de controle de estoque\ncom funcionalidades de cadastro e gerenciamento de produtos.",
+                font=ctk.CTkFont(size=14),
+                text_color=self.colors['text_secondary']
+            )
+            desc_label.pack(pady=20)
+            
+            # Botão para acessar estoque completo
+            btn_acessar_estoque = ctk.CTkButton(
+                placeholder_frame,
+                text="🏪 Acessar Estoque Completo",
+                font=ctk.CTkFont(size=16, weight="bold"),
+                height=48,  # Altura mínima para acessibilidade
+                width=280,
+                fg_color=self.colors['primary'],
+                hover_color=self.colors['primary_hover'],
+                text_color=self.colors['text_primary'],
+                corner_radius=8,
+                command=self.abrir_estoque_completo,
+                cursor="hand2"  # Cursor de mão para indicar clicável
+            )
+            btn_acessar_estoque.pack(pady=20)
+            
+            # Adicionar efeito de feedback visual ao botão
+            def on_button_press(event):
+                btn_acessar_estoque.configure(fg_color="#0f3a5f")  # Cor mais escura quando pressionado
+            
+            def on_button_release(event):
+                btn_acessar_estoque.configure(fg_color=self.colors['primary_hover'])
+            
+            btn_acessar_estoque.bind("<Button-1>", on_button_press)
+            btn_acessar_estoque.bind("<ButtonRelease-1>", on_button_release)
+            
+        else:
+            # Descrição padrão para outros módulos
+            desc_label = ctk.CTkLabel(
+                placeholder_frame,
+                text="Este módulo está em desenvolvimento.\nEm breve estará disponível com todas as funcionalidades.",
+                font=ctk.CTkFont(size=14),
+                text_color=self.colors['text_secondary']
+            )
+            desc_label.pack(pady=20)
     
+    def abrir_estoque_completo(self):
+        """Abre a tela completa de estoque em uma nova janela com transição suave"""
+        try:
+            # Desabilitar botão temporariamente para evitar múltiplos cliques
+            for widget in self.main_content.winfo_children():
+                if isinstance(widget, ctk.CTkFrame):
+                    for child in widget.winfo_children():
+                        if isinstance(child, ctk.CTkButton) and "Acessar Estoque" in child.cget("text"):
+                            child.configure(state="disabled")
+                            # Reabilitar após 1 segundo
+                            self.after(1000, lambda: child.configure(state="normal"))
+                            break
+            
+            # Importar e criar a tela de estoque
+            from modules.estoque import TelaEstoque
+            
+            # Criar nova janela para o estoque
+            estoque_window = ctk.CTkToplevel(self)
+            estoque_window.title("Sistema PDV - Gestão de Estoque")
+            estoque_window.geometry("1200x800")
+            estoque_window.resizable(True, True)
+            
+            # Configurar ícone se disponível
+            try:
+                estoque_window.iconbitmap("assets/icon.ico")
+            except:
+                pass
+            
+            # Centralizar janela na tela
+            estoque_window.update_idletasks()
+            x = (estoque_window.winfo_screenwidth() // 2) - (1200 // 2)
+            y = (estoque_window.winfo_screenheight() // 2) - (800 // 2)
+            estoque_window.geometry(f"1200x800+{x}+{y}")
+            
+            # Criar instância da tela de estoque
+            tela_estoque = TelaEstoque(estoque_window)
+            
+            # Adicionar botão de voltar ao menu na tela de estoque
+            self.add_back_button_to_estoque(tela_estoque)
+            
+            # Focar na nova janela
+            estoque_window.focus_force()
+            estoque_window.lift()
+            
+        except Exception as e:
+            print(f"Erro ao abrir estoque completo: {e}")
+            # Mostrar mensagem de erro para o usuário
+            error_dialog = ctk.CTkToplevel(self)
+            error_dialog.title("Erro")
+            error_dialog.geometry("400x200")
+            error_dialog.resizable(False, False)
+            
+            error_label = ctk.CTkLabel(
+                error_dialog,
+                text=f"Erro ao abrir módulo de estoque:\n{str(e)}",
+                font=ctk.CTkFont(size=14),
+                wraplength=350
+            )
+            error_label.pack(pady=40)
+            
+            ok_button = ctk.CTkButton(
+                error_dialog,
+                text="OK",
+                command=error_dialog.destroy,
+                width=100
+            )
+            ok_button.pack(pady=10)
+    
+    def add_back_button_to_estoque(self, estoque_instance):
+        """Adiciona botão 'Voltar ao Menu' no módulo de estoque"""
+        # Criar frame para o botão voltar no topo
+        back_frame = ctk.CTkFrame(
+            estoque_instance,
+            height=60,
+            fg_color="#1a1a1a",
+            corner_radius=0
+        )
+        back_frame.pack(fill="x", side="top", before=estoque_instance.winfo_children()[0])
+        back_frame.pack_propagate(False)
+        
+        # Botão voltar ao menu
+        btn_voltar = ctk.CTkButton(
+            back_frame,
+            text="⬅️ Voltar ao Menu Principal",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            height=40,
+            width=220,
+            fg_color="#1f538d",
+            hover_color="#14375e",
+            text_color="#ffffff",
+            corner_radius=6,
+            command=self.voltar_ao_menu,
+            cursor="hand2"  # Cursor de mão para indicar clicável
+        )
+        btn_voltar.pack(side="left", padx=20, pady=10)
+        
+        # Adicionar efeito de feedback visual ao botão voltar
+        def on_voltar_press(event):
+            btn_voltar.configure(fg_color="#0a2a42")  # Cor mais escura quando pressionado
+        
+        def on_voltar_release(event):
+            btn_voltar.configure(fg_color="#14375e")
+        
+        btn_voltar.bind("<Button-1>", on_voltar_press)
+        btn_voltar.bind("<ButtonRelease-1>", on_voltar_release)
+    
+    def voltar_ao_menu(self):
+        """Fecha a janela atual e retorna ao menu principal com transição suave"""
+        try:
+            # Obter a janela atual (que deve ser a janela de estoque)
+            current_window = self.winfo_toplevel()
+            
+            # Desabilitar botão temporariamente
+            for widget in current_window.winfo_children():
+                if hasattr(widget, 'winfo_children'):
+                    for child in widget.winfo_children():
+                        if isinstance(child, ctk.CTkFrame):
+                            for grandchild in child.winfo_children():
+                                if isinstance(grandchild, ctk.CTkButton) and "Voltar" in grandchild.cget("text"):
+                                    grandchild.configure(state="disabled")
+                                    break
+            
+            # Fechar a janela atual com um pequeno delay para suavidade
+            def close_window():
+                current_window.destroy()
+            
+            # Agendar fechamento após 200ms para dar feedback visual
+            current_window.after(200, close_window)
+            
+        except Exception as e:
+            print(f"Erro ao voltar ao menu: {e}")
+            # Em caso de erro, apenas fechar a janela
+            try:
+                self.winfo_toplevel().destroy()
+            except:
+                pass
+
     def abrir_vendas_completa(self):
         """Abre a tela completa de vendas"""
         try:
