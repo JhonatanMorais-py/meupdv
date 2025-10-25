@@ -2,6 +2,14 @@
 
    * Não realizar modificações em código, estrutura ou arquivos sem uma justificativa técnica válida.
 
+   * Não utilizar janela pop-up para exibir mensagens ou alertas, preferindo utilizar componentes nativos da interface.
+
+   * Manter a interface intuitiva e amigável, evitando elementos complexos ou confusos.
+   
+   * Evitar a utilização de elementos visuais desnecessários, como botões desabilitados, campos de texto vazios ou ícones irrelevantes.
+
+   * Manter apenas uma interface gráfica por tela, evitando a criação de múltiplas janelas ou abas desnecessárias.
+
 2. **Comentar funções complexas**
 
    * Adicionar comentários explicativos em todas as funções e trechos de código que possuam lógica complexa, para facilitar manutenção e compreensão futura.
@@ -32,4 +40,8 @@
 
 9. **Seguir boas práticas de programação**
 
-   * Adotar padrões de codificação, como indentação consistente, uso de emojis, evitando repetições desnecessárias e priorizando a legibilidade do código.
+   * Adotar padrões de codificação, como indentação consistente, evitando repetições desnecessárias e priorizando a legibilidade do código.
+
+   * Não utilizar emojis ou caracteres especiais em nomes de funções, variáveis ou arquivos, evitando confusões e erros de interpretação.
+
+   * Excluir arquivos test_

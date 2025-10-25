@@ -16,14 +16,37 @@ class TelaEstoque(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         
+        # Paleta de cores corporativa (baseada no padrão do dashboard)
+        self.colors = {
+            'primary': '#1f538d',           # Azul corporativo principal
+            'primary_hover': '#14375e',     # Azul hover
+            'secondary': '#2b2b2b',         # Cinza escuro secundário
+            'background': '#1a1a1a',        # Fundo escuro (sidebar_bg_dashboard - WCAG AA ✅)
+            'card_bg': '#2b2b2b',           # Fundo dos cards (escuro)
+            'text_primary': '#ffffff',      # Texto principal claro (para fundo escuro)
+            'text_secondary': '#cccccc',    # Texto secundário claro
+            'text_light': '#ffffff',        # Texto claro
+            'text_dark': '#2b2b2b',         # Texto escuro (para fundos claros)
+            'success': '#1e7e34',           # Verde para sucesso (ajustado para WCAG AA)
+            'success_hover': '#155724',     # Verde hover (mais escuro)
+            'warning': '#ffc107',           # Amarelo para avisos
+            'warning_hover': '#e0a800',     # Amarelo hover
+            'danger': '#dc3545',            # Vermelho para perigo
+            'danger_hover': '#c82333',      # Vermelho hover
+            'neutral': '#6c757d',           # Cinza neutro
+            'neutral_hover': '#5a6268',     # Cinza neutro hover
+            'border': '#404040',            # Bordas escuras
+            'input_bg': '#343a40',          # Fundo dos inputs (escuro)
+            'accent': '#0078d4'             # Azul de destaque
+        }
+        
         # Configurações da tela
-        self.configure(fg_color="#f0f0f0")
+        self.configure(fg_color=self.colors['background'])
         
         # Variáveis do formulário
         self.setup_variables()
         
         # Criar interface
-        self.create_header()
         self.create_form_sections()
         
         # Carregar dados iniciais
@@ -58,7 +81,7 @@ class TelaEstoque(ctk.CTkFrame):
         
     def create_header(self):
         """Cria o cabeçalho da tela"""
-        header_frame = ctk.CTkFrame(self, height=80, fg_color="#2b2b2b")
+        header_frame = ctk.CTkFrame(self, height=80, fg_color=self.colors['primary'])
         header_frame.pack(fill="x", padx=20, pady=(20, 10))
         header_frame.pack_propagate(False)
         
@@ -67,7 +90,7 @@ class TelaEstoque(ctk.CTkFrame):
             header_frame,
             text="📦 Cadastro de Produtos",
             font=ctk.CTkFont(size=28, weight="bold"),
-            text_color="white"
+            text_color=self.colors['text_light']
         )
         title_label.pack(side="left", padx=20, pady=20)
         
@@ -77,6 +100,9 @@ class TelaEstoque(ctk.CTkFrame):
             text="❓ Ajuda",
             width=100,
             height=40,
+            fg_color=self.colors['accent'],
+            hover_color=self.colors['primary_hover'],
+            text_color=self.colors['text_light'],
             command=self.show_help
         )
         help_btn.pack(side="right", padx=20, pady=20)
@@ -84,11 +110,11 @@ class TelaEstoque(ctk.CTkFrame):
     def create_form_sections(self):
         """Cria todas as seções do formulário"""
         # Frame principal com scroll
-        main_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
-        main_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        self.main_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        self.main_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
         # Container para as seções
-        sections_container = ctk.CTkFrame(main_frame, fg_color="transparent")
+        sections_container = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         sections_container.pack(fill="both", expand=True)
         
         # Grid de 2 colunas
@@ -115,17 +141,17 @@ class TelaEstoque(ctk.CTkFrame):
         
     def create_basic_info_section(self, parent, row, column):
         """Cria a seção de informações básicas"""
-        section_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=15)
-        section_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        section_frame = ctk.CTkFrame(parent, fg_color=self.colors['card_bg'], corner_radius=15)
+        section_frame.grid(row=row, column=column, padx=15, pady=15, sticky="nsew")
         
         # Título da seção
-        title = ctk.CTkLabel(
+        section_title = ctk.CTkLabel(
             section_frame,
             text="📋 Informações Básicas",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#2b2b2b"
+            text_color=self.colors['text_primary']
         )
-        title.pack(pady=(20, 15))
+        section_title.pack(pady=(20, 15))
         
         # Nome do produto (obrigatório)
         self.create_field(
@@ -169,7 +195,10 @@ class TelaEstoque(ctk.CTkFrame):
         
         self.codigo_entry = ctk.CTkEntry(
             codigo_input_frame,
-            textvariable=self.codigo_barras_var
+            textvariable=self.codigo_barras_var,
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['border']
         )
         self.codigo_entry.pack(side="left", fill="x", expand=True)
         self.codigo_entry.insert(0, "Digite ou escaneie o código")
@@ -178,23 +207,17 @@ class TelaEstoque(ctk.CTkFrame):
             codigo_input_frame,
             text="✓",
             width=40,
+            fg_color=self.colors['success'],
+            hover_color=self.colors['success_hover'],
+            text_color=self.colors['text_light'],
             command=self.validate_barcode
         )
         validate_btn.pack(side="right", padx=(10, 0))
         
     def create_stock_section(self, parent, row, column):
         """Cria a seção de estoque"""
-        section_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=15)
-        section_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
-        
-        # Título da seção
-        title = ctk.CTkLabel(
-            section_frame,
-            text="📊 Controle de Estoque",
-            font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#2b2b2b"
-        )
-        title.pack(pady=(20, 15))
+        section_frame = ctk.CTkFrame(parent, fg_color=self.colors['card_bg'], corner_radius=15)
+        section_frame.grid(row=row, column=column, padx=15, pady=15, sticky="nsew")
         
         # Quantidade inicial
         self.create_numeric_field(
@@ -220,15 +243,15 @@ class TelaEstoque(ctk.CTkFrame):
         
     def create_price_section(self, parent, row, column):
         """Cria a seção de preços"""
-        section_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=15)
-        section_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        section_frame = ctk.CTkFrame(parent, fg_color=self.colors['card_bg'], corner_radius=15)
+        section_frame.grid(row=row, column=column, padx=15, pady=15, sticky="nsew")
         
         # Título da seção
         title = ctk.CTkLabel(
             section_frame,
             text="💰 Preços e Margem",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#2b2b2b"
+            text_color=self.colors['text_primary']
         )
         title.pack(pady=(20, 15))
         
@@ -250,14 +273,21 @@ class TelaEstoque(ctk.CTkFrame):
         margem_frame = ctk.CTkFrame(section_frame, fg_color="transparent")
         margem_frame.pack(fill="x", padx=20, pady=5)
         
-        margem_label = ctk.CTkLabel(margem_frame, text="Margem de Lucro", font=ctk.CTkFont(size=14, weight="bold"))
+        margem_label = ctk.CTkLabel(
+            margem_frame, 
+            text="Margem de Lucro", 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         margem_label.pack(anchor="w")
         
         self.margem_entry = ctk.CTkEntry(
             margem_frame,
             textvariable=self.margem_lucro_var,
             state="readonly",
-            fg_color="#e8f5e8"
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['success']
         )
         self.margem_entry.pack(fill="x", pady=(5, 0))
         
@@ -267,15 +297,15 @@ class TelaEstoque(ctk.CTkFrame):
         
     def create_supplier_section(self, parent, row, column):
         """Cria a seção de fornecedor"""
-        section_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=15)
-        section_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        section_frame = ctk.CTkFrame(parent, fg_color=self.colors['card_bg'], corner_radius=15)
+        section_frame.grid(row=row, column=column, padx=15, pady=15, sticky="nsew")
         
         # Título da seção
         title = ctk.CTkLabel(
             section_frame,
             text="🏢 Fornecedor",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#2b2b2b"
+            text_color=self.colors['text_primary']
         )
         title.pack(pady=(20, 15))
         
@@ -291,27 +321,35 @@ class TelaEstoque(ctk.CTkFrame):
         info_frame = ctk.CTkFrame(section_frame, fg_color="transparent")
         info_frame.pack(fill="x", padx=20, pady=5)
         
-        info_label = ctk.CTkLabel(info_frame, text="Informações Adicionais", font=ctk.CTkFont(size=14, weight="bold"))
+        info_label = ctk.CTkLabel(
+            info_frame, 
+            text="Informações Adicionais", 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         info_label.pack(anchor="w")
         
         self.info_fornecedor_entry = ctk.CTkTextbox(
             info_frame,
-            height=80
+            height=80,
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['border']
         )
         self.info_fornecedor_entry.pack(fill="x", pady=(5, 0))
         self.info_fornecedor_entry.insert("1.0", "Observações sobre o fornecedor")
         
     def create_image_section(self, parent, row, column):
         """Cria a seção de imagem"""
-        section_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=15)
-        section_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        section_frame = ctk.CTkFrame(parent, fg_color=self.colors['card_bg'], corner_radius=15)
+        section_frame.grid(row=row, column=column, padx=15, pady=15, sticky="nsew")
         
         # Título da seção
         title = ctk.CTkLabel(
             section_frame,
             text="🖼️ Imagem do Produto",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#2b2b2b"
+            text_color=self.colors['text_primary']
         )
         title.pack(pady=(20, 15))
         
@@ -321,7 +359,8 @@ class TelaEstoque(ctk.CTkFrame):
             text="📷\nNenhuma imagem\nselecionada",
             width=200,
             height=150,
-            fg_color="#f0f0f0",
+            fg_color=self.colors['background'],
+            text_color=self.colors['text_secondary'],
             corner_radius=10
         )
         self.image_preview.pack(pady=10)
@@ -333,6 +372,9 @@ class TelaEstoque(ctk.CTkFrame):
         upload_btn = ctk.CTkButton(
             image_buttons_frame,
             text="📁 Selecionar Imagem",
+            fg_color=self.colors['primary'],
+            hover_color=self.colors['primary_hover'],
+            text_color=self.colors['text_light'],
             command=self.select_image
         )
         upload_btn.pack(side="left", padx=(0, 10))
@@ -340,23 +382,24 @@ class TelaEstoque(ctk.CTkFrame):
         remove_btn = ctk.CTkButton(
             image_buttons_frame,
             text="🗑️ Remover",
-            fg_color="#dc3545",
-            hover_color="#c82333",
+            fg_color=self.colors['danger'],
+            hover_color=self.colors['danger_hover'],
+            text_color=self.colors['text_light'],
             command=self.remove_image
         )
         remove_btn.pack(side="left")
         
     def create_controls_section(self, parent, row, column):
         """Cria a seção de controles"""
-        section_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=15)
-        section_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        section_frame = ctk.CTkFrame(parent, fg_color=self.colors['card_bg'], corner_radius=15)
+        section_frame.grid(row=row, column=column, padx=15, pady=15, sticky="nsew")
         
         # Título da seção
         title = ctk.CTkLabel(
             section_frame,
             text="⚙️ Ações",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#2b2b2b"
+            text_color=self.colors['text_primary']
         )
         title.pack(pady=(20, 15))
         
@@ -370,8 +413,9 @@ class TelaEstoque(ctk.CTkFrame):
             text="💾 Salvar Produto",
             height=50,
             font=ctk.CTkFont(size=16, weight="bold"),
-            fg_color="#28a745",
-            hover_color="#218838",
+            fg_color=self.colors['success'],
+            hover_color=self.colors['success_hover'],
+            text_color=self.colors['text_light'],
             command=self.save_product
         )
         save_btn.pack(fill="x", pady=(0, 10))
@@ -381,8 +425,9 @@ class TelaEstoque(ctk.CTkFrame):
             buttons_frame,
             text="❌ Cancelar",
             height=40,
-            fg_color="#6c757d",
-            hover_color="#5a6268",
+            fg_color=self.colors['neutral'],
+            hover_color=self.colors['neutral_hover'],
+            text_color=self.colors['text_light'],
             command=self.clear_form
         )
         cancel_btn.pack(fill="x", pady=(0, 10))
@@ -392,9 +437,9 @@ class TelaEstoque(ctk.CTkFrame):
             buttons_frame,
             text="🧹 Limpar Formulário",
             height=40,
-            fg_color="#ffc107",
-            hover_color="#e0a800",
-            text_color="black",
+            fg_color=self.colors['warning'],
+            hover_color=self.colors['warning_hover'],
+            text_color=self.colors['text_primary'],
             command=self.clear_form
         )
         clear_btn.pack(fill="x")
@@ -404,12 +449,20 @@ class TelaEstoque(ctk.CTkFrame):
         field_frame = ctk.CTkFrame(parent, fg_color="transparent")
         field_frame.pack(fill="x", padx=20, pady=5)
         
-        label = ctk.CTkLabel(field_frame, text=label_text, font=ctk.CTkFont(size=14, weight="bold"))
+        label = ctk.CTkLabel(
+            field_frame, 
+            text=label_text, 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         label.pack(anchor="w")
         
         entry = ctk.CTkEntry(
             field_frame,
-            textvariable=variable
+            textvariable=variable,
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['border']
         )
         entry.pack(fill="x", pady=(5, 0))
         
@@ -423,13 +476,21 @@ class TelaEstoque(ctk.CTkFrame):
         field_frame = ctk.CTkFrame(parent, fg_color="transparent")
         field_frame.pack(fill="x", padx=20, pady=5)
         
-        label = ctk.CTkLabel(field_frame, text=label_text, font=ctk.CTkFont(size=14, weight="bold"))
+        label = ctk.CTkLabel(
+            field_frame, 
+            text=label_text, 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         label.pack(anchor="w")
         
         entry = ctk.CTkEntry(
             field_frame,
             textvariable=variable,
-            justify="right"
+            justify="right",
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['border']
         )
         entry.pack(fill="x", pady=(5, 0))
         
@@ -443,19 +504,32 @@ class TelaEstoque(ctk.CTkFrame):
         field_frame = ctk.CTkFrame(parent, fg_color="transparent")
         field_frame.pack(fill="x", padx=20, pady=5)
         
-        label = ctk.CTkLabel(field_frame, text=label_text, font=ctk.CTkFont(size=14, weight="bold"))
+        label = ctk.CTkLabel(
+            field_frame, 
+            text=label_text, 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         label.pack(anchor="w")
         
         money_frame = ctk.CTkFrame(field_frame, fg_color="transparent")
         money_frame.pack(fill="x", pady=(5, 0))
         
-        currency_label = ctk.CTkLabel(money_frame, text="R$", font=ctk.CTkFont(size=14, weight="bold"))
+        currency_label = ctk.CTkLabel(
+            money_frame, 
+            text="R$", 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         currency_label.pack(side="left", padx=(0, 5))
         
         entry = ctk.CTkEntry(
             money_frame,
             textvariable=variable,
-            justify="right"
+            justify="right",
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['border']
         )
         entry.pack(side="left", fill="x", expand=True)
         
@@ -469,14 +543,24 @@ class TelaEstoque(ctk.CTkFrame):
         field_frame = ctk.CTkFrame(parent, fg_color="transparent")
         field_frame.pack(fill="x", padx=20, pady=5)
         
-        label = ctk.CTkLabel(field_frame, text=label_text, font=ctk.CTkFont(size=14, weight="bold"))
+        label = ctk.CTkLabel(
+            field_frame, 
+            text=label_text, 
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=self.colors['text_primary']
+        )
         label.pack(anchor="w")
         
         combo = ctk.CTkComboBox(
             field_frame,
             variable=variable,
             values=values,
-            state="readonly"
+            state="readonly",
+            fg_color=self.colors['input_bg'],
+            text_color=self.colors['text_primary'],
+            border_color=self.colors['border'],
+            button_color=self.colors['primary'],
+            button_hover_color=self.colors['primary_hover']
         )
         combo.pack(fill="x", pady=(5, 0))
         

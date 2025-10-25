@@ -238,6 +238,8 @@ class TelaDashboard(ctk.CTk):
             self.create_dashboard_content()
         elif module_name == "vendas":
             self.create_vendas_content()
+        elif module_name == "estoque":
+            self.create_estoque_content()
         else:
             self.create_placeholder_content(module_name)
     
@@ -544,6 +546,72 @@ class TelaDashboard(ctk.CTk):
             text_color=self.colors['text_secondary']
         )
         info_label.pack(expand=True)
+    
+    def create_estoque_content(self):
+        """Cria o conteúdo integrado do módulo de estoque"""
+        try:
+            # Importar o módulo de estoque
+            from modules.estoque import TelaEstoque
+            
+            # Criar frame container para o estoque
+            estoque_container = ctk.CTkFrame(
+                self.main_content,
+                corner_radius=0,
+                fg_color="transparent"
+            )
+            estoque_container.pack(fill="both", expand=True)
+            
+            # Criar instância da tela de estoque integrada
+            self.tela_estoque = TelaEstoque(estoque_container)
+            self.tela_estoque.pack(fill="both", expand=True, padx=10, pady=10)
+            
+            # Forçar atualização da interface
+            self.update_idletasks()
+            
+        except Exception as e:
+            print(f"Erro ao carregar módulo de estoque: {e}")
+            # Criar mensagem de erro amigável
+            error_frame = ctk.CTkFrame(self.main_content)
+            error_frame.pack(fill="both", expand=True)
+            
+            error_icon = ctk.CTkLabel(
+                error_frame,
+                text="⚠️",
+                font=ctk.CTkFont(size=48)
+            )
+            error_icon.pack(pady=(50, 20))
+            
+            error_title = ctk.CTkLabel(
+                error_frame,
+                text="Erro ao Carregar Módulo",
+                font=ctk.CTkFont(size=24, weight="bold"),
+                text_color=self.colors['text_primary']
+            )
+            error_title.pack(pady=10)
+            
+            error_desc = ctk.CTkLabel(
+                error_frame,
+                text=f"Não foi possível carregar o módulo de estoque.\nDetalhes: {str(e)}",
+                font=ctk.CTkFont(size=14),
+                text_color=self.colors['text_secondary']
+            )
+            error_desc.pack(pady=20)
+            
+            # Botão para tentar novamente
+            retry_btn = ctk.CTkButton(
+                error_frame,
+                text="🔄 Tentar Novamente",
+                font=ctk.CTkFont(size=16, weight="bold"),
+                height=48,
+                width=200,
+                fg_color=self.colors['primary'],
+                hover_color=self.colors['primary_hover'],
+                text_color=self.colors['text_primary'],
+                corner_radius=8,
+                command=lambda: self.select_module("estoque"),
+                cursor="hand2"
+            )
+            retry_btn.pack(pady=20)
     
     def create_placeholder_content(self, module_name):
         """Cria conteúdo placeholder para módulos em desenvolvimento"""
