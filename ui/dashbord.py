@@ -227,7 +227,7 @@ class TelaDashboard(ctk.CTk):
             "vendas": "Gestão de Vendas",
             "produtos": "Gestão de Produtos",
             "clientes": "Gestão de Clientes",
-            "estoque": "Controle de Estoque",
+            "estoque": "Gestão de Inventário",
             "relatorios": "Relatórios e Análises"
         }
         
